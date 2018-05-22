@@ -7,8 +7,7 @@
 [x] write util to convert mqtt sensor format to influx format (5)
 [ ] write util to import collected data to influx from file
 [x] write util to post from mosquitto_sub directly to influx (6)
-[ ] 
-[ ] unify mqtt-to-grafana
+[x] unify mqtt-to-grafana (7)
 
 
 
@@ -16,10 +15,11 @@
 
 
 ____________________________________________________________________
-0. in influxdb.testbed repo: installSerives.sh
-1. (0) and in influxdb.testbed repo: services.start
+0. in vaponic.collector repo: serives.install
+1. (0) && in vaponic.collector repo: services.start
 2. in influxdb.testbed repo: cpuValToInfluxDB.sh
-3. after (1), localhost:3000, see dashboard
-4. in vaponic.collector repo: mosquitto.run.sh and pow.vap.listen.sh; some data is collected on lubuntuN7 in dir data/
-5. in pahoqm repo: converter.py
-6. in pahomq repo: pahomq.py	
+3. (1) && localhost:3000 && see dashboard
+4. in vaponic.collector repo: services.start; some data is collected on lubuntuN7 in dir data/
+5. in vaponic.collector repo: pahomq.py::convert_to_influx()
+6. in vaponic.collector repo: pahomq.py	
+7. in vaponic.collector repo: services.install && services.start
