@@ -3,3 +3,4 @@
 
 sudo service influxdb stop
 sudo service grafana-server stop
+sudo kill $(pidof mosquitto)

@@ -10,9 +10,6 @@ grafanaDeb='deb https://packagecloud.io/grafana/stable/debian/ stretch main'
 influxDeb="deb https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable"
 sourcesFile='/etc/apt/sources.list'
 
-
-
-
 if ! grep -q "$grafanaDeb" "$sourcesFile" ; then
     sudo echo "$grafanaDeb" >> "$sourcesFile"
     curl https://packagecloud.io/gpg.key | sudo apt-key add -
@@ -23,9 +20,5 @@ if ! grep -q "$influxDeb" "$sourcesFile" ; then
     curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
 fi
 
-
-
-
 sudo apt-get update
-sudo apt-get install grafana
-sudo apt-get install influxdb
+sudo apt-get install grafana influxdb mosquitto mosquitto-clients
