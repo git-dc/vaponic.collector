@@ -1,0 +1,10 @@
+#! /bin/bash
+
+sudo service influxdb start 
+sudo service grafana-server start
+mosquitto >> mosquitto.log 2>&1 &
+
+mosquitto_sub -h lubuntuN7 -p 1883 -i "pow.vap.localbak" -t vaponic/tele/SENSOR >> data/vaponicData.log &
+
+./pahomq
+
