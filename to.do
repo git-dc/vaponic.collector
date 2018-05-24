@@ -5,9 +5,10 @@
 [x] plot with grafana from an influx db (3)_
 [x] rx from sensor through mqtt with mosquitto_sub and write to file (4)
 [x] write util to convert mqtt sensor format to influx format (5)
-[ ] write util to import collected data to influx from file
+[x] write util to import collected data to influx from file (8)
 [x] write util to post from mosquitto_sub directly to influx (6)
 [x] unify mqtt-to-grafana (7)
+[ ] make regular imports automatic
 
 
 
@@ -23,3 +24,4 @@ ____________________________________________________________________
 5. in vaponic.collector repo: pahomq.py::convert_to_influx()
 6. in vaponic.collector repo: pahomq.py	
 7. in vaponic.collector repo: services.install && services.start
+8. in vaponic.collectro repo: import.py
