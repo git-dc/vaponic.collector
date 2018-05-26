@@ -3,9 +3,13 @@
 #import paho.mqtt.client as mqtt
 import datetime
 import time
+import sys
+import argparse
 from influxdb import InfluxDBClient
 from hashlib import md5
 
+log = open("logs/import.%s.log"% get_time(),"w")
+    
 influxDB = "mydb"
 influxUsr="admin"
 influxPsk="admin"
@@ -13,19 +17,30 @@ influxPort=8086
 influxHost="lubuntuN7"
 
 dbclient = InfluxDBClient(influxHost,influxPort,influxUsr,influxPsk,influxDB)
+try:
+    datetosync = sys.argv[1]
+except:
+    log.write("%s Error: failed when reading args to import.py. One arg expected (date), none received. No data was pushed."% get_time())
+    sys.exit()
 
 def main():
-    sync_from("data/vaponicData.log")
+    sync_from(datafile)
     
 def hash(packet): # returns a hash of the packet to act as an id
     return str(md5(str(packet).encode("utf-8")).hexdigest()[:6])
 
 def sync_from(filename): # syncs from file <filename>
     data = open(filename, "r")
-    log = open("logs/import.%s.log"% get_time(),"w")
     log.write("%s Log of import of %s->influx.%s. Started at %s.\n" % (get_time(), filename, influxDB, str(datetime.datetime.now())))
     for line in data:
-        sync_entry(strip(line), log)
+        try:
+            strippedLine = strip(line)
+            try:
+                sync_entry(strippedLine, log)
+            except:
+                log.write("%s Error: import.py::sync_from(strippedline) failed for line in data: %s. Skipping this line."% (get_time(), strippedLine))
+        except:
+            log.write("%s Error: import.py::strip(line) failed for line in data: %s. Skipping this line."% (get_time(), line))
     data.close()
 
 def get_time(): # generates a unix timestamp

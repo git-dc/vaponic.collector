@@ -1,0 +1,5 @@
+#! /bin/bash
+
+croncmd="echo $(date) > /home/nyuad/work/vaponic.collector/corn.running"
+cronjob="00 04 * * * $croncmd"
+( crontab -l | grep -v -F "$croncmd" ; echo "$cronjob" ) | crontab -
