@@ -1,7 +1,7 @@
 #! /bin/bash
 
 echo "python3 pid: $(pidof python3)"
-echo "paho pid: $PAHOPID"
+echo "paho pid: $(tail -n 1 logs/paho.pids.log)"
 echo "mosquitto pid: $(pidof mosquitto)"
 echo "mosquitto_sub pid: $(pidof mosquitto_sub)"
 echo "influxd pid: $(pidof influxd)"

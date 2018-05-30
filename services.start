@@ -1,11 +1,9 @@
-
 #! /bin/bash
 
 sudo service influxdb start 
 sudo service grafana-server start
-mosquitto >> mosquitto.log 2>&1 &
-
-./pahomq.py & PAHOPID="echo $!"
+mosquitto >> "logs/mqtt.$(date +%s).log" 2>&1 &
+./pahomq.py & echo $! >> "logs/pahomq.pids.log"
 
 croncmd="/home/nyuad/work/vaponic.collector/cronjob"
 cronjob="00 03 * * * $croncmd"

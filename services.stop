@@ -1,8 +1,7 @@
 #! /bin/bash
 
-
 sudo service influxdb stop
 sudo service grafana-server stop
 sudo kill $(pidof mosquitto)
 sudo kill $(pidof mosquitto_sub)
-sudo kill "$PAHOPID"
+sudo kill $(tail -n 1 "logs/paho.pids.log")
