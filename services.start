@@ -2,9 +2,10 @@
 
 sudo service influxdb start 
 sudo service grafana-server start
-mosquitto >> mosquitto.log 2>&1 &
+mosquitto >> "logs/mqtt.$(date +%s).log" 2>&1 &
+./pahomq.py & echo $! >> "logs/pahomq.pids.log"
 
-mosquitto_sub -h lubuntuN7 -p 1883 -i "pow.vap.localbak" -t vaponic/tele/SENSOR >> data/vaponicData.log &
-
-./pahomq &
+croncmd="/home/nyuad/work/vaponic.collector/cronjob"
+cronjob="00 03 * * * $croncmd"
+( crontab -l | grep -v -F "$croncmd" ; echo "$cronjob" ) | crontab -
 
