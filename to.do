@@ -9,7 +9,7 @@
 [x] write util to post from mosquitto_sub directly to influx (6)
 [x] unify mqtt-to-grafana (7)
 [x] make regular imports automatic (9)
-[ ] add core utils for convenience
+[x] add core utils for convenience (10)
 
 
 
@@ -27,3 +27,4 @@ ____________________________________________________________________
 7. in vaponic.collector repo: services.install && services.start
 8. in vaponic.collector repo: import.py
 9. in vaponic.collector repo: services.start && cronjob
+10.in vaponic.collector repo: services.show
