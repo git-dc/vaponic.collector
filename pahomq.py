@@ -3,10 +3,12 @@
 import paho.mqtt.client as mqtt
 import datetime
 import time
+import sys
 from influxdb import InfluxDBClient
 from hashlib import md5
 
-influxDB = "mydb"
+verbose=0
+influxDB="mydb"
 influxUsr="admin"
 influxPsk="admin"
 influxPort=8086
@@ -14,21 +16,22 @@ influxHost="lubuntuN7"
 
 msqttPort=1883
 mqttHost="lubuntuN7"
+mqttHost="localhost"
 mqttTopic="vaponic/tele/SENSOR"
-
+mqttClientID="paho_client"
 dbclient = InfluxDBClient(influxHost,influxPort,influxUsr,influxPsk,influxDB)
-log = open("logs/paho.%s.log"% get_time(),"w")
-log.write("%s Log of paho client mqtt->influx.%s. Started at %s.\n" % (get_time(), influxDB, str(datetime.datetime.now())))
+
 def main():
     # set up a client for influxdb
     # initialize the mqtt client that should connect to the mosquitto broker
-    client = mqtt.Client()
+    client = mqtt.Client(client_id=mqttClientID,clean_session=False)
     client.on_connect = on_connect
     client.on_message = on_message
     connOK=False
     while(connOK == False):
         try:
-            client.connect(mqttHost,mqttPort,60)
+            #client.connect(mqttHost, mqttPort, 60)
+            client.connect('lubuntuN7', 1883, 60)
             connOK=True
         except:
             connOK=False
@@ -90,9 +93,9 @@ def convert_to_influx(message):
 
 # paho.mqtt.client function overload
 def on_connect(client, userdata, flags, rc):
-    log.write("%s Connected to mosquitto broker %s with result code %s"% (get_time(), str(mqttHost), str(rc)))
+    log.write("%s Connected to mosquitto broker %s with result code %s.\n"% (get_time(), str(mqttHost), str(rc)))
     client.subscribe(mqttTopic)
-    log.write("%s Subscribed to %s"% (get_time(), str(mqttTopic)))
+    log.write("%s Subscribed to %s.\n"% (get_time(), str(mqttTopic)))
 
 # paho.mqtt.client function overload
 def on_message(client, userdata, msg):
@@ -108,7 +111,8 @@ def on_message(client, userdata, msg):
     for key in keys:
         try: # convert the value to a float so that it is stored as a number in influx and not as a string in the db
             val=float(msgs[key])
-            log.write("%s Valid entry found in %s: '%s':'%s' (utc) %s at (utc) %s."% (get_time(), msgs["id"], key, str(val), str(msgs["Time"]), str(datetime.datetime.now())))
+            if verbose:
+                log.write("%s Valid entry found in %s: '%s':'%s' (utc) %s at (utc) %s."% (get_time(), msgs["id"], key, str(val), str(msgs["Time"]), str(datetime.datetime.now())))
             entry = {
                 "measurement":key,
                 "time":msgs["Time"],
@@ -118,14 +122,18 @@ def on_message(client, userdata, msg):
                 }
             }
             json_body.append(entry)
-            log.write(" Inserted into payload.\n")
+            if verbose:
+                log.write(" Inserted into payload.\n")
         except:
             log.write("%s Could not convert '%s':'%s' to a float value, skipping it.\n"% (get_time(), key, msgs[key]))
-            #user = input("Would you like to skip and proceed? (Y/n)")
-            #if user.lower() == "y": continue
-            #else: data.close()
     if len(json_body) > 0:
-        dbclient.write_points(json_body)
-        log.write("%s Pushed payload with id %s to %s at %s.\n"% (get_time(), msgs["id"], influxDB, get_time()))
+        try:
+            dbclient.write_points(json_body)
+            log.write("%s Pushed payload with id %s (generated at %s) to %s.\n"% (get_time(), msgs["Time"],msgs["id"], influxDB))
+        except:
+            log.write("%s Failed to push payload with id %s (generated at %s) to %s.\n"% (get_time(), msgs["Time"],msgs["id"], influxDB))
 
+log = open("logs/paho.%s.log"% get_time(), "w", 1)
+log.write("%s Log of paho client mqtt->influx.%s. Started at %s.\n" % (get_time(), influxDB, str(datetime.datetime.now())))
 main()
+log.close()

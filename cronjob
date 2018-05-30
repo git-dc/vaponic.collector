@@ -1,5 +1,7 @@
 #! /bin/bash
 
-croncmd="echo $(date) > /home/nyuad/work/vaponic.collector/corn.running"
-cronjob="00 04 * * * $croncmd"
-( crontab -l | grep -v -F "$croncmd" ; echo "$cronjob" ) | crontab -
+kill $(pidof mosquitto_sub)
+
+mosquitto_sub -h lubuntuN7 -p 1883 -i 'mqtt_sub_vap.power' -t vaponic/tele/SENSOR >> data/vaponicData.$(date +%b%d).log &
+
+./import.py -d "$(date -d 'yesterday' '+%b%d')" &

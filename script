@@ -5,26 +5,23 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Push data to database from local file.')
 
-parser.add_argument('<filename>', metavar='d', type=str, nargs='+', help='name of the datafile')
+parser.add_argument('-d', '--datafile', type=str, nargs='+', help='name of the datafile')
 
-parser.add_argument('-v', '--verbose', action='count', default=0)
-
-for c in ['', '-v', '--verbose']:
-        print("hello")
-        print (parser.parse_args(c.split()))
-        print("hi")
+parser.add_argument('-v', '--verbose', action='count', default=0, help='verbose mode')
         
-#args = parser.parse_args()
+args = parser.parse_args()
 
+print(args)
+print(args.verbose)
+print(type(args.verbose))
+print(args.datafile)
+print(type(args.datafile))
 
-
-for item in sys.argv:
-    print(item)
-try:
-    thisday = sys.argv[1]
-    print (thisday)
-except:
-    sys.exit("1 argument expected (date), none received")
+#try:
+#    thisday = sys.argv[1]
+#    print (thisday)
+#except:
+#    sys.exit("1 argument expected (date), none received")
 
 def main(syncday="missing date argument", log=sys.stdout):
     if syncday=="missing date argument":
@@ -33,6 +30,6 @@ def main(syncday="missing date argument", log=sys.stdout):
     
     print("data/vaponicData."+syncday+".log")
 
-main(thisday)
-main()
+#main(thisday)
+#main()
 
