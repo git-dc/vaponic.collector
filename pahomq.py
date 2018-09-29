@@ -12,12 +12,11 @@ influxDB="mydb"
 influxUsr="admin"
 influxPsk="admin"
 influxPort=8086
-influxHost="lubuntuN7"
+influxHost="house"
 
 msqttPort=1883
-mqttHost="lubuntuN7"
-mqttHost="localhost"
-mqttTopic="vaponic/tele/SENSOR"
+mqttHost="house"
+mqttTopic="tele/sonoff1/SENSOR"
 mqttClientID="paho_client"
 dbclient = InfluxDBClient(influxHost,influxPort,influxUsr,influxPsk,influxDB)
 
@@ -30,8 +29,8 @@ def main():
     connOK=False
     while(connOK == False):
         try:
-            #client.connect(mqttHost, mqttPort, 60)
-            client.connect('lubuntuN7', 1883, 60)
+            client.connect(mqttHost, mqttPort, 60)
+            #client.connect('lubuntuN7', 1883, 60)
             connOK=True
         except:
             connOK=False
@@ -70,8 +69,9 @@ def strip(message):
         if header != "Period": msgDict[header] = item[0] # put the header:val, where val is item[0], key-value pairs into msgDict; Period is a trash value - always 0
     return msgDict
 
-# takes a tasmota json and converts it to a dictionary 
-def convert_to_influx(message):
+########################### DEPRECATED BEGIN ######################################
+# takes a tasmota json and converts it to a dictionary
+def convert_to_influx(message): # DEPRECATED --- functionality fulfilled by strip()
     junk = ["{","}",'"','ENERGY:'] # these will be removed from the input string (json object)
     tags='' # any measurement tags should be added here
     msgDict = {} # the return dict
@@ -90,10 +90,12 @@ def convert_to_influx(message):
 
         msgDict[header] = item[0] # put the header:val, where val is item[0], key-value pairs into msgDict
     return msgDict
+############################## DEPRECATED END ######################################
+
 
 # paho.mqtt.client function overload
 def on_connect(client, userdata, flags, rc):
-    log.write("%s Connected to mosquitto broker %s with result code %s.\n"% (get_time(), str(mqttHost), str(rc)))
+    log.write("%s Connected to mosquitto broker at %s with result code %s.\n"% (get_time(), str(mqttHost), str(rc)))
     client.subscribe(mqttTopic)
     log.write("%s Subscribed to %s.\n"% (get_time(), str(mqttTopic)))
 
@@ -133,7 +135,7 @@ def on_message(client, userdata, msg):
         except:
             log.write("%s Failed to push payload with id %s (generated at %s) to %s.\n"% (get_time(), msgs["Time"],msgs["id"], influxDB))
 
-log = open("logs/paho.%s.log"% get_time(), "w", 1)
+log = open("%s---paho.log"% get_time(), "w", 1)
 log.write("%s Log of paho client mqtt->influx.%s. Started at %s.\n" % (get_time(), influxDB, str(datetime.datetime.now())))
 main()
 log.close()
